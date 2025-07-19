@@ -1,0 +1,18 @@
+# Como base se toma una imagen de open liberty ligera.
+FROM open-liberty:kernel-slim-java17-openj9
+
+#Instalar Features.
+RUN featureUtility installFeature \
+    jakartaee-10.0 \
+    microprofile-7.0 \
+    passwordUtilities-1.1 \
+    ssl-1.0
+
+# Copiar configuracion de Open Liberty.
+ADD https://raw.githubusercontent.com/BlackPixl/WorkShopDocker/refs/heads/main/server.xml /opt/ol/wlp/usr/servers/defaultServer/
+
+# Copiar Aplicaciones al directorio de apps.
+COPY guide-mongodb-intro.war /opt/ol/wlp/usr/servers/defaultServer/apps/
+COPY certs/truststore.p12 /opt/ol/wlp/output/defaultServer/resources/security/truststore.p12
+
+CMD ["server", "run", "defaultServer"]
