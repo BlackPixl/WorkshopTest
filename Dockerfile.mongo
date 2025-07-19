@@ -11,8 +11,8 @@ RUN mkdir -p /home/mongodb/data \
 COPY certs/ /home/mongodb/certs/
 
 # Copy MongoDB configuration and initialization script
-COPY mongodb.conf /home/mongodb/
-COPY index.js /home/mongodb/
+COPY mongo-config/mongodb.conf /home/mongodb/
+COPY mongo-config/index.js /home/mongodb/
 
 # Run MongoDB and initialize database during build (not ideal, but matching your current flow)
 RUN mongod \
