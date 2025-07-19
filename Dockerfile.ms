@@ -27,7 +27,7 @@ RUN featureUtility installFeature \
     ssl-1.0
 
 
-COPY server.xml /opt/ol/wlp/usr/servers/defaultServer/
+COPY liberty-config/server.xml /opt/ol/wlp/usr/servers/defaultServer/
 
 COPY --from=builder /app/target/openliberty-mongo-app.war /opt/ol/wlp/usr/servers/defaultServer/apps/
 

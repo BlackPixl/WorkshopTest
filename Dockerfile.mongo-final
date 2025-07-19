@@ -11,8 +11,8 @@ RUN mkdir -p /home/mongodb/data \
 COPY certs/ /home/mongodb/certs/
 
 # Copy MongoDB configuration and initialization script
-COPY mongodb.conf /home/mongodb/
-COPY index.js /docker-entrypoint-initdb.d/index.js
+COPY mongo-config/mongodb.conf /home/mongodb/
+COPY mongo-config/index.js /docker-entrypoint-initdb.d/index.js
 
 # Run MongoDB and initialize database during build (not ideal, but matching your current flow)
 #RUN mongod \
