@@ -1,14 +1,10 @@
 # Stage 1: Desarrollo, construir la aplicacion.
-# Usamos Maven con Java 17
 FROM maven:3.9.5-eclipse-temurin-17-alpine AS builder
 
-# Asignamos el directorio de trabajo.
 WORKDIR /app
 
-# Se copian el pom.xml
 COPY pom.xml .
 
-# Se copia el codigo fuente
 COPY src ./src
 
 RUN mvn clean package -DskipTests
@@ -18,7 +14,12 @@ FROM open-liberty:kernel-slim-java17-openj9 AS prod
 
 USER root
 
-RUN apt-get update && apt-get install -y net-tools && rm -rf /var/lib/apt/lists/*
+RUN groupadd executer && \
+    useradd --no-log-init -g executer -d /home/executer -s /sbin/nologin executer && \
+    mkdir -p /home/executer && \
+    chown -R executer:executer /opt/ol /home/executer /logs
+
+USER executer
 
 RUN featureUtility installFeature \
     jakartaee-10.0 \
@@ -26,12 +27,11 @@ RUN featureUtility installFeature \
     passwordUtilities-1.1 \
     ssl-1.0
 
-
 COPY liberty-config/server.xml /opt/ol/wlp/usr/servers/defaultServer/
 
 COPY --from=builder /app/target/openliberty-mongo-app.war /opt/ol/wlp/usr/servers/defaultServer/apps/
 
-COPY certs/truststore.p12 /opt/ol/wlp/output/defaultServer/resources/security/truststore.p12
+COPY --chown=executer:executer certs/truststore.p12 /opt/ol/wlp/output/defaultServer/resources/security/truststore.p12
 
 EXPOSE 9080
 

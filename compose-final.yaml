@@ -12,19 +12,20 @@ services:
       - ./certs:/home/mongodb/certs:ro
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
-#      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
       MONGO_INITDB_ROOT_PASSWORD_FILE: /run/secrets/mongo_root_pass
       MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
     secrets:
       - mongo_root_pass
     networks:
       - my-app-network
-    healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
-      interval: 10s
-      timeout: 5s
-      retries: 1
     restart: on-failure
+    cap_drop:
+      - ALL
+    cap_add:
+      - DAC_OVERRIDE
+      - CHOWN
+      - SETUID
+      - SETGID
 
   test-app:
     image: openliberty-ms:v1
@@ -40,14 +41,13 @@ services:
       MONGO_PORT: ${MONGO_PORT}
       MONGO_DBNAME: ${MONGO_DBNAME}
       MONGO_USER: ${MONGO_USER}
-#      MONGO_PASS_ENCODED: ${MONGO_PASS_ENCODED}
       MONGO_PASS_FILE: /run/secrets/mongo_db_pass
     secrets:
       - mongo_db_pass
     ports:
       - "9080:9080"
     volumes:
-      - ol_logs:/logs
+      - ./ol_logs:/logs
     networks:
       - my-app-network
     healthcheck:
@@ -55,6 +55,8 @@ services:
       interval: 10s
       retries: 1
     restart: on-failure
+    cap_drop:
+      - ALL
 
 volumes:
   mongo_data:

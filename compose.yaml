@@ -10,16 +10,13 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: secret
-      MONGO_INITDB_ROOT_PASSWORD_FILE: /run/secrets/mongo_root_pass
-#     MONGO_INITDB_DATABASE: testdb
     networks:
       - my-app-network
 
   test-app:
     build:
       context: .
-      dockerfile: Dockerfile.ms
-      target: prod
+      dockerfile: Dockerfile.ol
     image: openliberty-ms:v1
     container_name: openliberty-ms
     depends_on:
